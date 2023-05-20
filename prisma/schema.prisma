@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 Int                 @id @default(autoincrement())
+  email              String              @unique
+  name               String?
+  discordUid         String?
+  password           String?
+  posts              Post[]
+  liked              Post[]              @relation("PostLikes")
+  disliked           Post[]              @relation("PostDislikes")
+  resetPasswordCodes ResetPasswordCode[]
+
+  registerCode   RegisterCode? @relation(fields: [registerCodeId], references: [id], onDelete: Cascade)
+  registerCodeId String?       @unique
+
+  active Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Post {
+  id         Int     @id @default(autoincrement())
+  content    String
+  author     User    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId   Int
+  likedBy    User[]  @relation("PostLikes")
+  dislikedBy User[]  @relation("PostDislikes")
+  imageUrl   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ResetPasswordCode {
+  id         String   @id @default(uuid())
+  expiryDate DateTime
+  userId     Int
+  used       Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model RegisterCode {
+  id     String  @id @default(uuid())
+  used   Boolean @default(false)
+  userId Int     @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User?
+}
