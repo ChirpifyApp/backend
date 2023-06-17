@@ -9,7 +9,7 @@ export class MailService {
 
 	async sendRegistrationCode(code: RegisterCode) {
 		return await this.mailerService.sendMail({
-		to: await this.prisma.user.findFirst({ where: { id: code.userId } }).then((user) => user.email),
+			to: await this.prisma.user.findFirst({ where: { id: code.userId } }).then((user) => user.email),
 			subject: 'Chirpify registration',
 			template: './confirmation',
 			context: {
