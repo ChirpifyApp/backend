@@ -5,23 +5,23 @@ import { DiscordAuthGuard } from './guard/discord.auth.guard';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private authService: AuthService) { }
+	constructor(private authService: AuthService) {}
 
-    @UseGuards(DiscordAuthGuard)
-    @Get('discord/login')
-    async login() {
-        return;
-    }
+	@UseGuards(DiscordAuthGuard)
+	@Get('discord/login')
+	async login() {
+		return;
+	}
 
-    @UseGuards(DiscordAuthGuard)
-    @Get('discord/callback')
-    async discordAuthRedirect(@Req() req: any, @Res({ passthrough: true }) res: Response): Promise<Response> {
-        const { user }: { user: any } = req;
+	@UseGuards(DiscordAuthGuard)
+	@Get('discord/callback')
+	async discordAuthRedirect(@Req() req: any, @Res({ passthrough: true }) res: Response) {
+		const { user }: { user: any } = req;
 
-        const jwt = await this.authService.discordSignIn(user);
-        // Expire after 1 day
-        res.cookie('session', jwt, { httpOnly: true, expires: new Date(Date.now() + 86400000) });
+		const jwt = await this.authService.discordSignIn(user);
+		// Expire after 1 day
+		res.cookie('session', jwt, { httpOnly: true, expires: new Date(Date.now() + 86400000) });
 
-        return res.status(201).json({ jwt });
-    }
+		return res.redirect(`${process.env.FRONTEND_URL}/discord?jwt=${jwt}`);
+	}
 }

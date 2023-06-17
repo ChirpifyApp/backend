@@ -16,8 +16,8 @@ import { MailService } from './mail/mail.service';
 import { MailModule } from './mail/mail.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, UsersModule, PostsModule, SpacesModule, MailModule],
-  controllers: [AppController, UsersController, PostsController],
-  providers: [AppService, PrismaService, PostsService, SpacesService, MailService],
+	imports: [PrismaModule, AuthModule, UsersModule, PostsModule, SpacesModule, MailModule],
+	controllers: [AppController, UsersController, PostsController],
+	providers: [AppService, PrismaService, PostsService, SpacesService, MailService],
 })
 export class AppModule {}

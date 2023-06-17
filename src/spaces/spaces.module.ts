@@ -3,7 +3,7 @@ import { DoSpacesServiceProvider } from '.';
 import { SpacesService } from './spaces.service';
 
 @Module({
-    providers: [SpacesService, DoSpacesServiceProvider],
-    exports: [SpacesService, DoSpacesServiceProvider]
+	providers: [SpacesService, DoSpacesServiceProvider],
+	exports: [SpacesService, DoSpacesServiceProvider],
 })
-export class SpacesModule { }
+export class SpacesModule {}

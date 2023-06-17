@@ -57,6 +57,7 @@ model ResetPasswordCode {
 
 model RegisterCode {
   id     String  @id @default(uuid())
+  code   String?
   used   Boolean @default(false)
   userId Int     @unique
 

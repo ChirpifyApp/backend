@@ -4,7 +4,7 @@ import { SpacesModule } from 'src/spaces/spaces.module';
 import { SpacesService } from 'src/spaces/spaces.service';
 
 @Module({
-    providers: [SpacesService],
-    imports: [PrismaModule, SpacesModule],
+	providers: [SpacesService],
+	imports: [PrismaModule, SpacesModule],
 })
 export class PostsModule {}

@@ -1,15 +1,15 @@
-import { IsNotEmpty, IsOptional } from "class-validator";
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class RegisterUserDto {
-    @IsNotEmpty()
-    email: string;
+	@IsNotEmpty()
+	email: string;
 
-    @IsNotEmpty()
-    name: string;
+	@IsNotEmpty()
+	name: string;
 
-    @IsOptional()
-    password?: string;
+	@IsOptional()
+	password?: string;
 
-    @IsOptional()
-    discordUid?: string;
+	@IsOptional()
+	discordUid?: string;
 }

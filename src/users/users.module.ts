@@ -8,9 +8,9 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtStrategy } from 'src/auth/strategy/jwt.strategy';
 
 @Module({
-  providers: [UsersService, PrismaService],
-  controllers: [UsersController],
-  exports: [UsersService],
-  imports: [forwardRef(() => AuthModule), PrismaModule, ],
+	providers: [UsersService, PrismaService],
+	controllers: [UsersController],
+	exports: [UsersService],
+	imports: [forwardRef(() => AuthModule), PrismaModule],
 })
 export class UsersModule {}
