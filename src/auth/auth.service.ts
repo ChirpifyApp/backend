@@ -69,7 +69,6 @@ export class AuthService {
 		if (registerUserDto.password) registerUserDto.password = await encryptPassword(registerUserDto.password);
 
 		await this.checkRegisterLimitations(registerUserDto);
-		// TODO: Send verification email
 		const { password, discordUid, registerCodeId, ...user } = await this.prisma.user.create({
 			data: registerUserDto,
 		});
