@@ -3,7 +3,9 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
 import * as morgan from 'morgan';
 import { AppModule } from './app.module';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const chalk = require('chalk');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
 
 async function bootstrap() {

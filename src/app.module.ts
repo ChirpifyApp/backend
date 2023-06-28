@@ -11,7 +11,6 @@ import { PostsService } from './posts/posts.service';
 import { PostsModule } from './posts/posts.module';
 import { SpacesService } from './spaces/spaces.service';
 import { SpacesModule } from './spaces/spaces.module';
-import { UsersService } from './users/users.service';
 import { MailService } from './mail/mail.service';
 import { MailModule } from './mail/mail.module';
 
