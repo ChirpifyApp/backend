@@ -65,7 +65,7 @@ export class AuthService {
 	}
 
 	async register(registerUserDto: RegisterUserDto, discord = false) {
-		await this.checkPasswordRequirements(registerUserDto);
+		if (!discord) await this.checkPasswordRequirements(registerUserDto);
 		if (registerUserDto.password) registerUserDto.password = await encryptPassword(registerUserDto.password);
 
 		await this.checkRegisterLimitations(registerUserDto);
