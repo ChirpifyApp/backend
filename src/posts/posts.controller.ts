@@ -3,10 +3,12 @@ import {
 	Controller,
 	Delete,
 	Get,
+	HttpStatus,
 	MaxFileSizeValidator,
 	Param,
 	ParseFilePipe,
 	Post,
+	Res,
 	UploadedFile,
 	UseGuards,
 	UseInterceptors,
@@ -17,6 +19,7 @@ import { JwtAuthGuard } from 'src/auth/guard/jwt.auth.guard';
 import { UserDecorator } from 'src/decorators/user.decorator';
 import { CreatePostDto } from './dto/create-post.dto';
 import { PostsService } from './posts.service';
+import { Response } from 'express';
 
 @Controller('posts')
 export class PostsController {
@@ -76,15 +79,19 @@ export class PostsController {
 
 	@UseGuards(JwtAuthGuard)
 	@Get('/top/weekly')
-	async getWeeklyTopPost() {
-		return await this.postsService.getWeeklyTopPost();
+	async getWeeklyTopPost(@Res() response: Response) {
+		try {
+			return response.send(await this.postsService.getWeeklyTopPost());
+		} catch (e) {
+			return response.status(HttpStatus.NO_CONTENT).send();
+		}
 	}
 
 	@UseGuards(JwtAuthGuard)
 	@Get('/recent/:page')
 	async getRecentPosts(@UserDecorator() user: User, @Param('page') page: string) {
-		let take = 2;
-		let skip = (parseInt(page) - 1) * take;
+		const take = 2;
+		const skip = (parseInt(page) - 1) * take;
 		return await this.postsService.getRecentPosts(skip, take, parseInt(page), user);
 	}
 }
