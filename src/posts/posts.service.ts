@@ -74,23 +74,39 @@ export class PostsService {
 	}
 
 	async getWeeklyTopPost() {
-		return await this.prisma.post.findFirst({
+		return await this.prisma.post.findFirstOrThrow({
 			where: {
 				createdAt: {
 					gte: this.getPastDate(),
 				},
 			},
-			orderBy: {
-				likedBy: {
-					_count: 'desc',
+			orderBy: [
+				{
+					likedBy: {
+						_count: 'desc',
+					},
 				},
-			},
+				{
+					dislikedBy: {
+						_count: 'asc',
+					},
+				},
+			],
 			include: {
+				author: {
+					select: {
+						name: true,
+						email: true,
+					},
+				},
 				likedBy: {
 					select: {
 						id: true,
-						name: true,
-						email: true,
+					},
+				},
+				dislikedBy: {
+					select: {
+						id: true,
 					},
 				},
 			},
@@ -158,7 +174,7 @@ export class PostsService {
 	}
 
 	async getReactions(postId: number) {
-		return await this.prisma.post.findMany({
+		return await this.prisma.post.findFirst({
 			where: {
 				id: postId,
 			},
