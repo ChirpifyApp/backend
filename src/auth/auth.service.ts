@@ -15,6 +15,8 @@ import { LoginUserDto } from 'src/users/dto/login-user.dto';
 import { RegisterUserDto } from 'src/users/dto/register-user.dto';
 import { UsersService } from 'src/users/users.service';
 import { encryptPassword } from 'src/utils';
+import { ResetPasswordDto } from '../users/dto/reset-password.dto';
+import { RequestResetPasswordDto } from '../users/dto/request-reset-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -57,15 +59,15 @@ export class AuthService {
 		}
 	}
 
-	async checkPasswordRequirements(registerUserDto: RegisterUserDto) {
+	async checkPasswordRequirements(password: string) {
 		const regex = /^(?=.*[a-zA-Z!@#$%^&*])(?=.*\d).{8,}$/;
-		if (!regex.test(registerUserDto.password)) {
+		if (!regex.test(password)) {
 			throw new BadRequestException('Password requirements not met.');
 		}
 	}
 
 	async register(registerUserDto: RegisterUserDto, discord = false) {
-		if (!discord) await this.checkPasswordRequirements(registerUserDto);
+		if (!discord) await this.checkPasswordRequirements(registerUserDto.password);
 		if (registerUserDto.password) registerUserDto.password = await encryptPassword(registerUserDto.password);
 
 		await this.checkRegisterLimitations(registerUserDto);
@@ -127,5 +129,85 @@ export class AuthService {
 			})) as any;
 		}
 		return user;
+	}
+
+	async sendResetPasswordEmail(requestResetPasswordDto: RequestResetPasswordDto) {
+		const user = await this.prisma.user.findFirst({
+			where: { email: requestResetPasswordDto.email },
+		});
+		if (!user) {
+			throw new BadRequestException('User not found.');
+		}
+		if (!user.active) {
+			throw new ForbiddenException('User is not verified.');
+		}
+		// Set all active to inactive
+		await this.prisma.resetPasswordCode.updateMany({
+			data: {
+				active: false,
+			},
+			where: {
+				userId: user.id,
+				active: true,
+			},
+		});
+
+		const code = await this.prisma.resetPasswordCode.create({
+			data: {
+				expiryDate: new Date(Date.now() + 1000 * 60 * 60), // 1 hour
+				userId: user.id,
+			},
+		});
+
+		this.mail.sendResetPasswordCode(code); // let's not wait
+		const { password, registerCodeId, ...userWithoutPassword } = user;
+		return userWithoutPassword;
+	}
+
+	async resetPassword(resetPasswordDto: ResetPasswordDto) {
+		if (resetPasswordDto.password != resetPasswordDto.confirmPassword) {
+			throw new BadRequestException('Passwords do not match.');
+		}
+		await this.checkPasswordRequirements(resetPasswordDto.password);
+		const code = await this.prisma.resetPasswordCode.findFirst({
+			where: {
+				id: resetPasswordDto.code,
+				active: true,
+			},
+		});
+		if (!code) {
+			throw new BadRequestException('Invalid code.');
+		}
+		if (code.expiryDate < new Date()) {
+			throw new BadRequestException('Code expired.');
+		}
+		const user = await this.prisma.user.findFirst({
+			where: {
+				id: code.userId,
+			},
+		});
+		if (!user) {
+			throw new BadRequestException('User not found.');
+		}
+
+		await this.prisma.user.update({
+			where: {
+				id: user.id,
+			},
+			data: {
+				password: await encryptPassword(resetPasswordDto.password),
+			},
+		});
+
+		await this.prisma.resetPasswordCode.update({
+			where: {
+				id: code.id,
+			},
+			data: {
+				active: false,
+			},
+		});
+		const { password, registerCodeId, ...userWithoutPassword } = user;
+		return userWithoutPassword;
 	}
 }

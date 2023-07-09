@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, NotFoundException, UnauthorizedExcepti
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { SpacesService } from 'src/spaces/spaces.service';
+import { CreatePostDto } from './dto/create-post.dto';
 
 @Injectable()
 export class PostsService {
@@ -24,9 +25,12 @@ export class PostsService {
 		});
 	}
 
-	async createPost(user: User, data: any, file: Express.Multer.File) {
+	async createPost(user: User, data: CreatePostDto, file?: Express.Multer.File) {
+		if (data.content.length > 128) {
+			throw new BadRequestException('Content length must be less than 128 characters');
+		}
 		let url;
-		if (file) {
+		if (file?.size > 0) {
 			url = await this.spaces.uploadFile(file);
 			console.log(url);
 		}
@@ -35,6 +39,30 @@ export class PostsService {
 				...data,
 				authorId: user.id,
 				imageUrl: url,
+			},
+			select: {
+				id: true,
+				content: true,
+				authorId: true,
+				imageUrl: true,
+				author: {
+					select: {
+						name: true,
+						email: true,
+					},
+				},
+				createdAt: true,
+				updatedAt: true,
+				likedBy: {
+					select: {
+						id: true,
+					},
+				},
+				dislikedBy: {
+					select: {
+						id: true,
+					},
+				},
 			},
 		});
 	}

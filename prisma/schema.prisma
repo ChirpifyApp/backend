@@ -47,6 +47,7 @@ model ResetPasswordCode {
   id         String   @id @default(uuid())
   expiryDate DateTime
   userId     Int
+  active     Boolean  @default(true)
   used       Boolean  @default(false)
 
   createdAt DateTime @default(now())

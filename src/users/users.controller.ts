@@ -8,6 +8,8 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { UsersService } from './users.service';
 import { Response } from 'express';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { RequestResetPasswordDto } from './dto/request-reset-password.dto';
 
 @Controller('users')
 export class UsersController {
@@ -46,5 +48,18 @@ export class UsersController {
 		const json = await this.authService.createJwtToken(user.email, user.id);
 		response.cookie('session', json.jwt, { expires: new Date(Date.now() + 86400000) });
 		return response.send(json);
+	}
+
+	// For sending a request
+	@Get('resetpassword')
+	async resetPasswordRequest(@Body() requestResetPasswordDto: RequestResetPasswordDto) {
+		console.log(requestResetPasswordDto);
+		return await this.authService.sendResetPasswordEmail(requestResetPasswordDto);
+	}
+
+	// For handling the password change request
+	@Post('resetpassword')
+	async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+		return await this.authService.resetPassword(resetPasswordDto);
 	}
 }

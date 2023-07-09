@@ -3,6 +3,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
 import * as morgan from 'morgan';
 import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const chalk = require('chalk');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -44,6 +45,7 @@ async function bootstrap() {
 
 	app.getHttpAdapter().getInstance().set('etag', false);
 	app.use(cookieParser());
+	app.useGlobalPipes(new ValidationPipe());
 
 	/* let transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,

@@ -46,7 +46,7 @@ export class PostsController {
 
 	@UseGuards(JwtAuthGuard)
 	@Post('create')
-	@UseInterceptors(FileInterceptor('file', {}))
+	@UseInterceptors(FileInterceptor('image', {}))
 	async createPost(
 		@UserDecorator() user: User,
 		@Body() createPostDto: CreatePostDto,
