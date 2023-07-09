@@ -45,7 +45,7 @@ export class UsersController {
 	@Get('verify/:id')
 	async verify(@Param('id') id: string, @Query('code') code: string, @Res() response: Response) {
 		const user = await this.usersService.verifyUser(id, code);
-		const json = await this.authService.createJwtToken(user.email, user.id);
+		const json = await this.authService.createJwtToken(user.email, user.id, user.password);
 		response.cookie('session', json.jwt, { expires: new Date(Date.now() + 86400000) });
 		return response.send(json);
 	}

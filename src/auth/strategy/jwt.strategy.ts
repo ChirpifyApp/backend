@@ -20,7 +20,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 		});
 	}
 
-	async validate(payload: any): Promise<User> {
-		return await this.authService.getUser(payload.uid);
+	async validate(payload: any, done): Promise<User> {
+		if (!payload.uid || !payload.password) return done(null, false);
+		return await this.authService.getValidation(payload.uid, payload.password);
 	}
 }

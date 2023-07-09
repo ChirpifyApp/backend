@@ -16,6 +16,10 @@ export class UsersService {
 		return this.prisma.user.findUnique({ where: { id } });
 	}
 
+	async findOneByIdAndPassword(id: number, password: string): Promise<User> {
+		return this.prisma.user.findFirst({ where: { id: id, password: password } });
+	}
+
 	async updateUser(user: User, data: UpdateUserDto) {
 		if (!user.discordUid) {
 			// Regular user

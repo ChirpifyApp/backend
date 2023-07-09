@@ -31,8 +31,12 @@ export class AuthService {
 		return await this.usersService.findOneById(userId);
 	}
 
-	async createJwtToken(email: string, uid: number) {
-		const payload = { email: email, uid: uid };
+	async getValidation(userId: number, password: string) {
+		return await this.usersService.findOneByIdAndPassword(userId, password);
+	}
+
+	async createJwtToken(email: string, uid: number, password: string) {
+		const payload = { email: email, uid: uid, password: password };
 		return {
 			jwt: await this.jwtService.signAsync(payload, { expiresIn: '1d' }),
 		};
@@ -49,7 +53,7 @@ export class AuthService {
 		if (user?.password != (await encryptPassword(loginUserDto.password))) {
 			throw new UnauthorizedException();
 		}
-		return await this.createJwtToken(user.email, user.id);
+		return await this.createJwtToken(user.email, user.id, user.password);
 	}
 
 	async checkRegisterLimitations(registerUserDto: RegisterUserDto) {
