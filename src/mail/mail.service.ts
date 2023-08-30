@@ -25,7 +25,7 @@ export class MailService {
 			subject: 'Chirpify password reset',
 			template: './reset',
 			context: {
-				url: `${process.env.FRONTEND_URL}/resetpassword/?code=${code.id}`,
+				url: `${process.env.FRONTEND_URL}/resetpassword/${code.id}`,
 			},
 		});
 	}
